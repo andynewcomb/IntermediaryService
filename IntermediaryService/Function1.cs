@@ -27,7 +27,7 @@ namespace IntermediaryService
 
             return name != null
                 ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Testing continuous integration");
+                : new BadRequestObjectResult("Testing continuous integration. Again.");
         }
     }
 }
