@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntermediaryService", "IntermediaryService\IntermediaryService.csproj", "{7883A949-13B4-45C3-BBE0-CBCA8BC1D5DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntermediaryService", "IntermediaryService\IntermediaryService.csproj", "{7883A949-13B4-45C3-BBE0-CBCA8BC1D5DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntermediaryService.Tests", "IntermediaryService.Tests\IntermediaryService.Tests.csproj", "{BF4972EE-C2E8-4055-84C5-6E57F8CD1DB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{7883A949-13B4-45C3-BBE0-CBCA8BC1D5DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7883A949-13B4-45C3-BBE0-CBCA8BC1D5DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7883A949-13B4-45C3-BBE0-CBCA8BC1D5DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF4972EE-C2E8-4055-84C5-6E57F8CD1DB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF4972EE-C2E8-4055-84C5-6E57F8CD1DB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF4972EE-C2E8-4055-84C5-6E57F8CD1DB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF4972EE-C2E8-4055-84C5-6E57F8CD1DB2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

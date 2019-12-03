@@ -17,17 +17,27 @@ namespace IntermediaryService
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            try
+            {
+                log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string name = req.Query["name"];
+                string name = req.Query["name"];
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                dynamic data = JsonConvert.DeserializeObject(requestBody);
+                name = name ?? data?.name;
 
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Testing continuous integration. Again.");
+                return name != null
+                    ? (ActionResult)new OkObjectResult($"Hello, {name}")
+                    : new BadRequestObjectResult("Testing continuous integration. Again.");
+            }
+            catch (Exception ex) //gracefully deal with an unhandled exception
+            {
+                log.LogError(ex, "Unhandled Exception occurred");
+                return new StatusCodeResult(500);
+            }
+            
+            
         }
     }
 }
