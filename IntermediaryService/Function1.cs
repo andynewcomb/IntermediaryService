@@ -48,6 +48,12 @@ namespace IntermediaryService
                 }
 
 
+                //Generate an "Intermediary Service Document" to be stored in CosmosDB
+                //It will contain a unique identifier that will also be used for the callback URL
+                //var callBackUrl = StorageM()
+
+
+
                 //send to third party using the injected httpClient.                 
                 var success = await _thirdPartyServiceHttpClient.PostAsyncSuccessful(document, "request", log);
                                 
