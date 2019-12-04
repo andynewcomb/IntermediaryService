@@ -21,17 +21,21 @@ namespace IntermediaryService
         }
 
         [FunctionName("Function1")]
-        public async Task<IActionResult> Run(
+        public IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "intermediaryservice/request")] HttpRequest req,
+            [CosmosDB(databaseName: "IntermediaryServiceDB", collectionName: "documents", ConnectionStringSetting = "CosmosDBConnection")]out dynamic intermediaryDocument,
             ILogger log)
         {
+            intermediaryDocument = new { Name = "Andy", Date = "whatever", Id=Guid.NewGuid().ToString() };
             try
-            {
+            {   
                 log.LogInformation("Function1 processed a request.");
 
                 //retrieve the body of the request which should be of type Document
                 Document document;
-                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();                
+                string requestBody = new StreamReader(req.Body).ReadToEndAsync().Result;
+                //Note: I initially used "await" - however adding CosmosDB out binding in signature meant I can't have an async method anymore.
+                //I may consider using a static cosmosDb client instead of the output binding if I need/want async
                 try
                 {
                     document = JsonConvert.DeserializeObject<Document>(requestBody);
@@ -43,26 +47,28 @@ namespace IntermediaryService
                 }
                 catch (JsonException ex)
                 {                    
-                    log.LogInformation(ex, UserFriendlyMessages.ErrorProcessingBody,requestBody);
+                    log.LogInformation(ex, UserFriendlyMessages.ErrorProcessingBody,requestBody);                    
                     return new BadRequestObjectResult(UserFriendlyMessages.ErrorProcessingBody);
                 }
 
 
                 //Generate an "Intermediary Service Document" to be stored in CosmosDB
-                //It will contain a unique identifier that will also be used for the callback URL
+                //It will contain the callback URL, and the status information for the document
                 //var callBackUrl = StorageM()
 
 
 
-                //send to third party using the injected httpClient.                 
-                var success = await _thirdPartyServiceHttpClient.PostAsyncSuccessful(document, "request", log);
+                //send to third party using the injected httpClient.
+                //Note: I initually used "await" - however when I added the Cosmos output binding the method could no longer be "async"
+                var success = _thirdPartyServiceHttpClient.PostAsyncSuccessful(document, "request", log).Result;
                                 
                 return new OkObjectResult("Success");
             }            
             catch (Exception ex) //gracefully deal with an unhandled exception
             {
-                log.LogError(ex, UserFriendlyMessages.UnhandledException);                
-                return new StatusCodeResult(500);
+                log.LogError(ex, UserFriendlyMessages.UnhandledException);
+                return new OkObjectResult("Success");
+                //return new StatusCodeResult(500);
             }
         }
 

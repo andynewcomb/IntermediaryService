@@ -7,12 +7,21 @@ Users can send a GET to receive status updates.
 
 Notes/Prerequisites: 
 This application is a coding challenge and does not actually access a third party service.
-To run the application you will need to 
+To run the application you will need:
 
-* have an Azure Storage Emulator (application uses the emulator to emulate a cosmosDb)
-* have visual studio 2019 or later running on a windows machine with the "Azure Development" workload
+*Azure CosmosDb Storage Emulator - 
+This emulator must be installed and running before you run the application locally from visual studio. 
+When running locally, the application uses the emulator to emulate a cosmosDb. 
+The emulator can be downloaded here: https://aka.ms/cosmosdb-emulator. 
+Instructions for installing and running found here: https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator#installation
 
-Instructions for running application
-* clone the repository
-* open IntermediaryService.sln in visual studio
-* click the green triangle to start the 4 functions
+*Visual Studio 2019 -
+Visual studio 2019 or later running on a windows machine with the "Azure Development" workload
+
+*Instructions: 
+clone the repository
+open IntermediaryService.sln in visual studio 2019
+Click the green "run" triangle to start the application.
+Use Postman (or cURL or other API testing tool) to test that the endpoints are working.
+
+
