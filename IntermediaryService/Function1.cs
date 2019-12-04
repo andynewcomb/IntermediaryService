@@ -15,7 +15,7 @@ namespace IntermediaryService
     {
         [FunctionName("Function1")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "intermediaryservice/request")] HttpRequest req,
             ILogger log)
         {
             try
