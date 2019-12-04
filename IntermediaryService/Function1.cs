@@ -23,10 +23,9 @@ namespace IntermediaryService
         [FunctionName("Function1")]
         public IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "intermediaryservice/request")] HttpRequest req,
-            [CosmosDB(databaseName: "IntermediaryServiceDB", collectionName: "documents", ConnectionStringSetting = "CosmosDBConnection")]out dynamic intermediaryDocument,
+            [CosmosDB(databaseName: "IntermediaryServiceDb", collectionName: "IntermediaryService", ConnectionStringSetting = "CosmosDBConnection")]out dynamic intermediaryDocument,
             ILogger log)
-        {
-            intermediaryDocument = new { Name = "Andy", Date = "whatever", Id=Guid.NewGuid().ToString() };
+        {   
             try
             {   
                 log.LogInformation("Function1 processed a request.");
@@ -47,28 +46,38 @@ namespace IntermediaryService
                 }
                 catch (JsonException ex)
                 {                    
-                    log.LogInformation(ex, UserFriendlyMessages.ErrorProcessingBody,requestBody);                    
+                    log.LogInformation(ex, UserFriendlyMessages.ErrorProcessingBody,requestBody);
+                    intermediaryDocument = null;
                     return new BadRequestObjectResult(UserFriendlyMessages.ErrorProcessingBody);
                 }
 
-
-                //Generate an "Intermediary Service Document" to be stored in CosmosDB
-                //It will contain the callback URL, and the status information for the document
-                //var callBackUrl = StorageM()
-
-
-
+                var uniqueId = Guid.NewGuid().ToString();
                 //send to third party using the injected httpClient.
                 //Note: I initually used "await" - however when I added the Cosmos output binding the method could no longer be "async"
-                var success = _thirdPartyServiceHttpClient.PostAsyncSuccessful(document, "request", log).Result;
-                                
-                return new OkObjectResult("Success");
+                //Perhaps will use static CosmosDb client instead if "async" is necessary.
+                var success = _thirdPartyServiceHttpClient.PostAsyncSuccessful(document, uniqueId, log).Result;
+
+                //Now Generate an "Intermediary Service Document" to be stored in CosmosDB
+                //It will keep status information and the document body 
+                intermediaryDocument = new IntermediaryServiceDocument
+                {
+                    id = uniqueId,
+                    Document = document,
+                    Status = new Status
+                    {
+                        StatusCode = "Sent",
+                        Detail = "",
+                        TimeStamp = DateTime.UtcNow.ToString()
+                    }
+                };
+                
+                return new NoContentResult();
             }            
             catch (Exception ex) //gracefully deal with an unhandled exception
             {
-                log.LogError(ex, UserFriendlyMessages.UnhandledException);
-                return new OkObjectResult("Success");
-                //return new StatusCodeResult(500);
+                intermediaryDocument = null;
+                log.LogError(ex, UserFriendlyMessages.UnhandledException);                
+                return new StatusCodeResult(500);
             }
         }
 

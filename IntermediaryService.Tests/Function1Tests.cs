@@ -19,6 +19,7 @@ namespace IntermediaryService.Tests
         private Mock<IThirdPartyServiceHttpClient> _mockHttpClient;        
         private Function1 _function1; 
         private MockLogger _mockLogger;
+        private dynamic _cosmosDocument;
 
         [TestInitialize]
         public void InitializeTest()
@@ -37,13 +38,13 @@ namespace IntermediaryService.Tests
             var mockHttpRequest = new Mock<HttpRequest>();
 
             //act
-            var actionResult = await _function1.Run(mockHttpRequest.Object, _mockLogger);
+            var actionResult = _function1.Run(mockHttpRequest.Object, out _cosmosDocument, _mockLogger);
 
             //assert                        
             Assert.IsTrue(_mockLogger.GetLogs().Where(m=>m.Contains(UserFriendlyMessages.UnhandledException)).Any());
             Assert.IsInstanceOfType(actionResult, typeof(StatusCodeResult));
             Assert.IsTrue(String.Equals(((StatusCodeResult)actionResult).StatusCode, 500));
-            
+            Assert.IsNull(_cosmosDocument); //Make sure cosmos document won't be saved
         }
 
         [TestMethod]
@@ -60,11 +61,12 @@ namespace IntermediaryService.Tests
             var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody("");                                    
 
             //act
-            var actionResult = await _function1.Run(mockHttpRequest.Object, _mockLogger);
+            var actionResult = _function1.Run(mockHttpRequest.Object, out _cosmosDocument, _mockLogger);
 
             //assert                                    
             Assert.IsInstanceOfType(actionResult, typeof(BadRequestObjectResult));
             StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), UserFriendlyMessages.ErrorProcessingBody);
+            Assert.IsNull(_cosmosDocument); //Make sure cosmos document won't be saved
         }
 
         [DataTestMethod]        
@@ -76,12 +78,13 @@ namespace IntermediaryService.Tests
             var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(body);            
 
             //act
-            var actionResult = await _function1.Run(mockHttpRequest.Object, _mockLogger);
+            var actionResult = _function1.Run(mockHttpRequest.Object, out _cosmosDocument, _mockLogger);
 
             //assert 
             Assert.IsTrue(_mockLogger.GetLogs().Where(m => m.Contains(UserFriendlyMessages.ErrorProcessingBody)).Count() == 1);
             Assert.IsInstanceOfType(actionResult, typeof(BadRequestObjectResult));
             StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), UserFriendlyMessages.ErrorProcessingBody);
+            Assert.IsNull(_cosmosDocument); //Make sure cosmos document won't be saved
         }
 
         [DataTestMethod]
@@ -93,28 +96,41 @@ namespace IntermediaryService.Tests
             var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(body);            
 
             //act
-            var actionResult = await _function1.Run(mockHttpRequest.Object, _mockLogger);
+            var actionResult = _function1.Run(mockHttpRequest.Object, out _cosmosDocument, _mockLogger);
 
             //assert 
             Assert.IsTrue(_mockLogger.GetLogs().Where(m => m.Contains(UserFriendlyMessages.ErrorProcessingBody)).Any());
             Assert.IsInstanceOfType(actionResult, typeof(BadRequestObjectResult));
             StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), UserFriendlyMessages.ErrorProcessingBody);
+            Assert.IsNull(_cosmosDocument); //Make sure cosmos document won't be saved
         }
 
         [TestMethod]
-        public async Task Run_SendsHttpRequestToExampleDotCom()
+        public async Task Run_SendsHttpRequestToExampleDotCom_CosmosDocumentPopulated()
         {
             //arrange            
             var goodJson = "{\"body\":\"Some Text\"}";
             var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(goodJson);
-            _mockHttpClient.Setup(c => c.PostAsyncSuccessful(It.IsAny<Document>(), It.IsAny<string>(),It.IsAny<ILogger>())).Verifiable();
+            _mockHttpClient.Setup(c => c.PostAsyncSuccessful(It.IsAny<Document>(), It.IsAny<string>(),It.IsAny<ILogger>())).Returns(Task.FromResult(true)).Verifiable();
 
             //act
-            var actionResult = await _function1.Run(mockHttpRequest.Object, _mockLogger);
+            var actionResult = _function1.Run(mockHttpRequest.Object, out _cosmosDocument, _mockLogger);
 
             //assert
             _mockHttpClient.Verify();
+            Assert.IsInstanceOfType(actionResult, typeof(NoContentResult));
+            Assert.IsInstanceOfType(_cosmosDocument, typeof(IntermediaryServiceDocument));
         }
+
+
+
+
+        //test for content-type json (content negotiation if desired)
+
+
+
+
+
 
         private Mock<HttpRequest> CreateMockHttpRequestWithSpecifiedBody(string body)
         {            
@@ -129,7 +145,10 @@ namespace IntermediaryService.Tests
             return mockHttpRequest;
         }       
         
-        //test for content-type json
+        
+
+
+
     }
 
     

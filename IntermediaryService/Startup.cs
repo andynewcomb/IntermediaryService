@@ -14,11 +14,11 @@ namespace IntermediaryService
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {            
-            //register the stubbed httpclient that does *NOT* actually send requests.
-            //This is injected into Function1 to simulate http requests www.example.com/request
-            builder.Services.AddHttpClient<IThirdPartyServiceHttpClient, StubbedThirdPartyServiceHttpClient>(client =>
+            //register the httpclient that does *NOT* actually send requests.
+            //This is injected into Function1 to simulate http requests to www.example.com/request
+            builder.Services.AddHttpClient<IThirdPartyServiceHttpClient, RealThirdPartyServiceHttpClient>(client =>
             {
-                client.BaseAddress = new Uri("http://www.example.com");
+                client.BaseAddress = new Uri("http://www.example.com/request");
             });
 
             //we can register a real httpclient that does indeed send real request when 

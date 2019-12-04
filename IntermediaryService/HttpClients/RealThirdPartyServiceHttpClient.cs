@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,9 +16,15 @@ namespace IntermediaryService
     /// </summary>
     class RealThirdPartyServiceHttpClient : IThirdPartyServiceHttpClient
     {
+        private readonly HttpClient _httpClient;
+        public RealThirdPartyServiceHttpClient(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
         public Task<bool> PostAsyncSuccessful(Document document, string callBackUrl, ILogger log)
         {
-            throw new NotImplementedException();
+            //stubbed for now
+            return Task.FromResult(true);
         }
     }
 }

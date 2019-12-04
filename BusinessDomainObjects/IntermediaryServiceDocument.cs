@@ -6,8 +6,8 @@ namespace BusinessDomainObjects
 {
     public class IntermediaryServiceDocument
     {
-        public Document Document { get; set; }
-        public string CallBackUrl { get; set; }
+        public string id { get; set; }
+        public Document Document { get; set; }        
         public Status Status { get; set; }
     }
 }
