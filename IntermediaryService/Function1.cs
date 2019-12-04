@@ -53,7 +53,7 @@ namespace IntermediaryService
 
                 var uniqueId = Guid.NewGuid().ToString(); 
                 var statusCode = "Sent"; //status code represents the partition key for the cosmoDb container
-                var callBack = $"{uniqueId}/{statusCode}"; 
+                var callBack = $"/{uniqueId}/{statusCode}"; 
                 //send to third party using the injected httpClient.
                 //Note: I initually used "await" - however when I added the Cosmos output binding the method could no longer be "async"
                 //Perhaps will use static CosmosDb client instead if "async" is necessary.
