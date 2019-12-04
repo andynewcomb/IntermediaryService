@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions.Internal;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace IntermediaryService.Tests.HelperMockClasses
 {
-    class MockLogger : ILogger
+    public class MockLogger : ILogger
     {
         private IList<string> logs;
 

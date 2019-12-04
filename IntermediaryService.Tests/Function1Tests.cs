@@ -6,6 +6,7 @@ using Moq;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace IntermediaryService.Tests
@@ -14,21 +15,31 @@ namespace IntermediaryService.Tests
     public class Function1Tests
     {
 
+        private Mock<IThirdPartyServiceHttpClient> _mockHttpClient;        
+        private Function1 _function1; 
+        private MockLogger _mockLogger;
+
+        [TestInitialize]
+        public void InitializeTest()
+        {
+            _mockHttpClient = new Mock<IThirdPartyServiceHttpClient>();
+            _function1 = new Function1(_mockHttpClient.Object);
+            _mockLogger = new MockLogger();
+        }
         
+
 
         [TestMethod]
         public async Task Run_CatchAnyExceptionsTricklingUpToTopLevelFunctionCode()
         {
             //arrange            
             var mockHttpRequest = new Mock<HttpRequest>();
-            var mockLogger = new MockLogger();
 
             //act
-            var actionResult = await Function1.Run(mockHttpRequest.Object, mockLogger);
-
+            var actionResult = await _function1.Run(mockHttpRequest.Object, _mockLogger);
 
             //assert                        
-            Assert.IsTrue(mockLogger.GetLogs().Where(m=>m.Contains(UserFriendlyMessages.UnhandledException)).Any());
+            Assert.IsTrue(_mockLogger.GetLogs().Where(m=>m.Contains(UserFriendlyMessages.UnhandledException)).Any());
             Assert.IsInstanceOfType(actionResult, typeof(StatusCodeResult));
             Assert.IsTrue(String.Equals(((StatusCodeResult)actionResult).StatusCode, 500));
             
@@ -45,11 +56,10 @@ namespace IntermediaryService.Tests
         public async Task Run_NoBodyInRequest_Return400()
         {
             //arrange
-            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody("");                        
-            var mockLogger = new MockLogger();
+            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody("");                                    
 
             //act
-            var actionResult = await Function1.Run(mockHttpRequest.Object, mockLogger);
+            var actionResult = await _function1.Run(mockHttpRequest.Object, _mockLogger);
 
             //assert                                    
             Assert.IsInstanceOfType(actionResult, typeof(BadRequestObjectResult));
@@ -62,14 +72,13 @@ namespace IntermediaryService.Tests
         public async Task Run_MalformedBodyInRequest_Return400(string body)
         {
             //arrange            
-            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(body);
-            var mockLogger = new MockLogger();
+            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(body);            
 
             //act
-            var actionResult = await Function1.Run(mockHttpRequest.Object, mockLogger);
+            var actionResult = await _function1.Run(mockHttpRequest.Object, _mockLogger);
 
             //assert 
-            Assert.IsTrue(mockLogger.GetLogs().Where(m => m.Contains(UserFriendlyMessages.ErrorProcessingBody)).Count() == 1);
+            Assert.IsTrue(_mockLogger.GetLogs().Where(m => m.Contains(UserFriendlyMessages.ErrorProcessingBody)).Count() == 1);
             Assert.IsInstanceOfType(actionResult, typeof(BadRequestObjectResult));
             StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), UserFriendlyMessages.ErrorProcessingBody);
         }
@@ -80,17 +89,34 @@ namespace IntermediaryService.Tests
         public async Task Run_JsonObjectDeserialized_BodyPropertyNull_Return400(string body)
         {
             //arrange            
-            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(body);
-            var mockLogger = new MockLogger();
+            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(body);            
 
             //act
-            var actionResult = await Function1.Run(mockHttpRequest.Object, mockLogger);
+            var actionResult = await _function1.Run(mockHttpRequest.Object, _mockLogger);
 
             //assert 
-            Assert.IsTrue(mockLogger.GetLogs().Where(m => m.Contains(UserFriendlyMessages.ErrorProcessingBody)).Any());
+            Assert.IsTrue(_mockLogger.GetLogs().Where(m => m.Contains(UserFriendlyMessages.ErrorProcessingBody)).Any());
             Assert.IsInstanceOfType(actionResult, typeof(BadRequestObjectResult));
             StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), UserFriendlyMessages.ErrorProcessingBody);
         }
+
+        [TestMethod]
+        public async Task Run_SendsHttpRequestToExampleDotCom()
+        {
+            //arrange            
+            var goodJson = "{\"body\":\"Some Text\"}";
+            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(goodJson);
+            _mockHttpClient.Setup(c => c.PostAsync()).Verifiable();
+
+            //act
+            var actionResult = await _function1.Run(mockHttpRequest.Object, _mockLogger);
+
+            //assert
+            _mockHttpClient.Verify();
+
+
+        }
+
 
         private Mock<HttpRequest> CreateMockHttpRequestWithSpecifiedBody(string body)
         {            

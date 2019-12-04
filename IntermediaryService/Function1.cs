@@ -11,10 +11,17 @@ using BusinessDomainObjects;
 
 namespace IntermediaryService
 {
-    public static class Function1
+    public class Function1
     {
+        private readonly IThirdPartyServiceHttpClient _thirdPartyServiceHttpClient;
+
+        public Function1(IThirdPartyServiceHttpClient thirdPartyServiceHttpClient)
+        {
+            _thirdPartyServiceHttpClient = thirdPartyServiceHttpClient;
+        }
+
         [FunctionName("Function1")]
-        public static async Task<IActionResult> Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "intermediaryservice/request")] HttpRequest req,
             ILogger log)
         {
@@ -40,7 +47,9 @@ namespace IntermediaryService
                     return new BadRequestObjectResult(UserFriendlyMessages.ErrorProcessingBody);
                 }
 
-                
+
+                //send to third party using injectable httpClient that we can swap out later
+                await _thirdPartyServiceHttpClient.PostAsync();
 
 
                 return new OkObjectResult("Success");
