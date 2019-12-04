@@ -1,0 +1,18 @@
+Summary: 
+Intermediary API Service that takes requests from a user to initiate a transaction on a fictitious third party service.
+The transaction can take up to 10 days to complete. 
+Users can send a POST to start the transaction.
+Users can send a GET to receive status updates.
+
+
+Notes/Prerequisites: 
+This application is a coding challenge and does not actually access a third party service.
+To run the application you will need to 
+
+* have an Azure Storage Emulator (application uses the emulator to emulate a cosmosDb)
+* have visual studio 2019 or later running on a windows machine with the "Azure Development" workload
+
+Instructions for running application
+* clone the repository
+* open IntermediaryService.sln in visual studio
+* click the green triangle to start the 4 functions
