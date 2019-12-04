@@ -26,8 +26,7 @@ namespace IntermediaryService.Tests
         public async Task PostAsync_ThrowsException_Logged()
         {
             //arrange
-            var stubbedThirdPartyServiceHttpClient = new StubbedThirdPartyServiceHttpClient(_mockHttpClient.Object);
-            _mockHttpClient.Setup(c => c.PostAsync(It.IsAny<string>(), It.IsAny<StringContent>())).Throws(new SystemException());
+            var stubbedThirdPartyServiceHttpClient = new StubbedThirdPartyServiceHttpClient(_mockHttpClient.Object);            
             var document = new Document { Body = "Some text" };
             
             //act            
