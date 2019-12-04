@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using BusinessDomainObjects;
 
 namespace IntermediaryService
 {
@@ -28,16 +29,25 @@ namespace IntermediaryService
                 }
 
                 
+                try
+                {
+                    var data = JsonConvert.DeserializeObject<ClientDocument>(requestBody);
+                }
+                catch (JsonException ex)
+                {
+                    var errorMessage = "Could Not Process Body of Request";
+                    log.LogInformation(ex, errorMessage);
+                    return new BadRequestObjectResult("Could Not Process Body of Request");
+                }
+
 
                 return new OkObjectResult("Success");
-            }
+            }            
             catch (Exception ex) //gracefully deal with an unhandled exception
             {
                 log.LogError(ex, "Unhandled Exception occurred");
                 return new StatusCodeResult(500);
             }
-            
-            
         }
     }
 }

@@ -45,13 +45,7 @@ namespace IntermediaryService.Tests
         public async Task Run_NoBodyInRequest_Return400()
         {
             //arrange            
-            var memoryStream = new MemoryStream();
-            var streamWriter = new StreamWriter(memoryStream);
-            streamWriter.Write("");
-            streamWriter.Flush();
-            memoryStream.Position = 0;
-            var mockHttpRequest = new Mock<HttpRequest>();
-            mockHttpRequest.Setup(r => r.Body).Returns(memoryStream);
+            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody("");                        
             var mockLogger = new MockLogger();
 
             //act
@@ -62,9 +56,39 @@ namespace IntermediaryService.Tests
             StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), "Could Not Process Body of Request");
         }
 
-        //test for content-type json
+        [DataTestMethod]        
+        [DataRow("blabla")]        
+        [DataRow("%&*")]
+        public async Task Run_MalformedBodyInRequest_Return400(string body)
+        {
+            //arrange            
+            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(body);
+            var mockLogger = new MockLogger();
+
+            //act
+            var actionResult = await Function1.Run(mockHttpRequest.Object, mockLogger);
+
+            //assert 
+            Assert.IsTrue(mockLogger.GetLogs().Where(m => m.Contains("Could Not Process Body of Request")).Count() == 1);
+            Assert.IsInstanceOfType(actionResult, typeof(BadRequestObjectResult));
+            StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), "Could Not Process Body of Request");
+        }
 
         
+        private Mock<HttpRequest> CreateMockHttpRequestWithSpecifiedBody(string body)
+        {            
+            var memoryStream = new MemoryStream();
+            var streamWriter = new StreamWriter(memoryStream);
+            streamWriter.Write(body);
+            streamWriter.Flush();
+            memoryStream.Position = 0;
+            
+            var mockHttpRequest = new Mock<HttpRequest>();
+            mockHttpRequest.Setup(r => r.Body).Returns(memoryStream);
+            return mockHttpRequest;
+        }       
+        
+        //test for content-type json
     }
 
     

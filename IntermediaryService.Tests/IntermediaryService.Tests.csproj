@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BusinessDomainObjects\BusinessDomainObjects.csproj" />
     <ProjectReference Include="..\IntermediaryService\IntermediaryService.csproj" />
   </ItemGroup>
 
