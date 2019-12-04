@@ -3,17 +3,19 @@ Intermediary API Service that takes requests from a user to initiate a transacti
 The transaction can take up to 10 days to complete. 
 Users can send a POST to start the transaction.
 Users can send a GET to receive status updates.
+Try the live application using PostMan (https://www.getpostman.com/) by trying the following URLs:
+
+Endpoint1:
+-https://intermediaryservicefirst.azurewebsites.net/request?code=IIDziKrTjabXroyONqLJkH1/4QD/ccPgcRt2m8Z0ia/7MN3G2TEyaw==
+
+Endpoint2:
+-https://intermediaryservicefirst.azurewebsites.net/started/{guid}?code=IIDziKrTjabXroyONqLJkH1/4QD/ccPgcRt2m8Z0ia/7MN3G2TEyaw==
+
 
 
 Notes/Prerequisites: 
 This application is a coding challenge and does not actually access a third party service.
 To run the application you will need:
-
-*Azure CosmosDb Storage Emulator - 
-This emulator must be installed and running before you run the application locally from visual studio. 
-When running locally, the application uses the emulator to emulate a cosmosDb. 
-The emulator can be downloaded here: https://aka.ms/cosmosdb-emulator. 
-Instructions for installing and running found here: https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator#installation
 
 *Visual Studio 2019 -
 Visual studio 2019 or later running on a windows machine with the "Azure Development" workload
@@ -22,6 +24,5 @@ Visual studio 2019 or later running on a windows machine with the "Azure Develop
 clone the repository
 open IntermediaryService.sln in visual studio 2019
 Click the green "run" triangle to start the application.
-Use Postman (or cURL or other API testing tool) to test that the endpoints are working.
-
-
+A console window should appear showing the URL for the API endpoints you can test.
+Use Postman to test that the endpoints are working.

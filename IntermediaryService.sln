@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntermediaryService", "Inte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntermediaryService.Tests", "IntermediaryService.Tests\IntermediaryService.Tests.csproj", "{BF4972EE-C2E8-4055-84C5-6E57F8CD1DB2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessDomainObjects", "BusinessDomainObjects\BusinessDomainObjects.csproj", "{F2EDD989-74C7-4BA3-B2C8-B0E2EF290A21}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessDomainObjects", "BusinessDomainObjects\BusinessDomainObjects.csproj", "{F2EDD989-74C7-4BA3-B2C8-B0E2EF290A21}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

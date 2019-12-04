@@ -22,7 +22,7 @@ namespace IntermediaryService
 
         [FunctionName("Function1")]
         public IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "intermediaryservice/request")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "request")] HttpRequest req,
             [CosmosDB(databaseName: "IntermediaryServiceDb", collectionName: "IntermediaryService", ConnectionStringSetting = "CosmosDBConnection")]out dynamic intermediaryDocument,
             ILogger log)
         {   
