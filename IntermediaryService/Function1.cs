@@ -14,22 +14,22 @@ namespace IntermediaryService
     {
         [FunctionName("Function1")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             try
             {
                 log.LogInformation("C# HTTP trigger function processed a request.");
 
-                string name = req.Query["name"];
-
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                dynamic data = JsonConvert.DeserializeObject(requestBody);
-                name = name ?? data?.name;
+                if (String.IsNullOrWhiteSpace(requestBody))
+                {                    
+                    return new BadRequestObjectResult("Could Not Process Body of Request");
+                }
 
-                return name != null
-                    ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                    : new BadRequestObjectResult("Testing continuous integration. Again.");
+                
+
+                return new OkObjectResult("Success");
             }
             catch (Exception ex) //gracefully deal with an unhandled exception
             {
