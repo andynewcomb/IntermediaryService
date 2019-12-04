@@ -1,5 +1,4 @@
 ﻿using BusinessDomainObjects;
-using IntermediaryService.HttpClients;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

@@ -27,13 +27,13 @@ namespace IntermediaryService.Tests
         {
             //arrange
             var stubbedThirdPartyServiceHttpClient = new StubbedThirdPartyServiceHttpClient(_mockHttpClient.Object);
+            _mockHttpClient.Setup(c => c.PostAsync(It.IsAny<string>(), It.IsAny<StringContent>())).Throws(new SystemException());
             var document = new Document { Body = "Some text" };
             
             //act            
-            var result = await stubbedThirdPartyServiceHttpClient.PostAsync(document, "request/1",_mockLogger);
+            await Assert.ThrowsExceptionAsync<NullReferenceException>(async () => await stubbedThirdPartyServiceHttpClient.PostAsyncSuccessful(document, "request/1",_mockLogger));
 
-            //assert
-            Assert.IsFalse(result.Success);
+            //assert            
             Assert.IsTrue(_mockLogger.GetLogs().Any(m => m.Contains(UserFriendlyMessages.ThirdPartyCommunicationFailure)));
 
         }

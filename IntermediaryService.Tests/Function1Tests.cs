@@ -107,7 +107,7 @@ namespace IntermediaryService.Tests
             //arrange            
             var goodJson = "{\"body\":\"Some Text\"}";
             var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(goodJson);
-            _mockHttpClient.Setup(c => c.PostAsync(It.IsAny<Document>(), It.IsAny<string>(),It.IsAny<ILogger>())).Verifiable();
+            _mockHttpClient.Setup(c => c.PostAsyncSuccessful(It.IsAny<Document>(), It.IsAny<string>(),It.IsAny<ILogger>())).Verifiable();
 
             //act
             var actionResult = await _function1.Run(mockHttpRequest.Object, _mockLogger);
