@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
@@ -118,8 +119,27 @@ namespace IntermediaryService.Tests
 
             //assert
             _mockHttpClient.Verify();
-            Assert.IsInstanceOfType(actionResult, typeof(NoContentResult));
+            Assert.IsInstanceOfType(actionResult, typeof(OkObjectResult));
             Assert.IsInstanceOfType(_cosmosDocument, typeof(IntermediaryServiceDocument));
+        }
+
+        [TestMethod]
+        public async Task Run_GoodRequest_ReturnsOriginalDocument()
+        {
+            //arrange
+            var document = new Document() { Body = "Some Text" };
+            var documentAsJson = JsonConvert.SerializeObject(document);
+            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(documentAsJson);
+            _mockHttpClient.Setup(c => c.PostAsyncSuccessful(It.IsAny<Document>(), It.IsAny<string>(), It.IsAny<ILogger>())).Returns(Task.FromResult(true)).Verifiable();
+
+            //act
+            var actionResult = _function1.Run(mockHttpRequest.Object, out _cosmosDocument, _mockLogger);
+
+            //assert
+            _mockHttpClient.Verify();
+            Assert.IsInstanceOfType(actionResult, typeof(OkObjectResult));
+            Assert.IsInstanceOfType(_cosmosDocument, typeof(IntermediaryServiceDocument));
+            Assert.IsTrue(String.Equals(document.Body, ((Document)((OkObjectResult)actionResult).Value).Body));
         }
 
 

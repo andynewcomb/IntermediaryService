@@ -71,7 +71,7 @@ namespace IntermediaryService
                     }
                 };
                 
-                return new NoContentResult();
+                return new OkObjectResult(document);
             }            
             catch (Exception ex) //gracefully deal with an unhandled exception
             {
