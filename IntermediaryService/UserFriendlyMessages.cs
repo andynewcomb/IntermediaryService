@@ -8,6 +8,7 @@ namespace IntermediaryService
     {
         public const string ErrorProcessingBody = "Could Not Process Body of Request";
         public const string UnhandledException = "Something didn't work right. Please Try Again Later";
+        public const string ThirdPartyCommunicationFailure = "Failed to communicate with third Party";
 
     }
 }

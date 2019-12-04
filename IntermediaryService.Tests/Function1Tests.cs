@@ -1,12 +1,13 @@
+using BusinessDomainObjects;
 using IntermediaryService.Tests.HelperMockClasses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace IntermediaryService.Tests
@@ -106,17 +107,14 @@ namespace IntermediaryService.Tests
             //arrange            
             var goodJson = "{\"body\":\"Some Text\"}";
             var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(goodJson);
-            _mockHttpClient.Setup(c => c.PostAsync()).Verifiable();
+            _mockHttpClient.Setup(c => c.PostAsync(It.IsAny<Document>(), It.IsAny<string>(),It.IsAny<ILogger>())).Verifiable();
 
             //act
             var actionResult = await _function1.Run(mockHttpRequest.Object, _mockLogger);
 
             //assert
             _mockHttpClient.Verify();
-
-
         }
-
 
         private Mock<HttpRequest> CreateMockHttpRequestWithSpecifiedBody(string body)
         {            

@@ -2,7 +2,7 @@
 
 namespace BusinessDomainObjects
 {
-    public class ClientDocument
+    public class Document
     {
         public string Body { get; set; }
     }

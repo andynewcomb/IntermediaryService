@@ -29,14 +29,14 @@ namespace IntermediaryService
             {
                 log.LogInformation("Function1 processed a request.");
 
-                //retrieve the body of the request which should be a ClientDocument
-                ClientDocument clientDocument;
+                //retrieve the body of the request which should be of type Document
+                Document document;
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();                
                 try
                 {
-                    clientDocument = JsonConvert.DeserializeObject<ClientDocument>(requestBody);
+                    document = JsonConvert.DeserializeObject<Document>(requestBody);
                     //Check that the clientDocument object and it's Body property are NOT null                     
-                    if (clientDocument?.Body == null)
+                    if (document?.Body == null)
                     {
                         throw new JsonException("Object was deserialized to null");
                     }
@@ -48,15 +48,14 @@ namespace IntermediaryService
                 }
 
 
-                //send to third party using injectable httpClient that we can swap out later
-                await _thirdPartyServiceHttpClient.PostAsync();
-
-
+                //send to third party using the injected httpClient.                 
+                var success = await _thirdPartyServiceHttpClient.PostAsyncSuccessful(document, "request", log);
+                                
                 return new OkObjectResult("Success");
             }            
             catch (Exception ex) //gracefully deal with an unhandled exception
             {
-                log.LogError(ex, UserFriendlyMessages.UnhandledException);
+                log.LogError(ex, UserFriendlyMessages.UnhandledException);                
                 return new StatusCodeResult(500);
             }
         }
