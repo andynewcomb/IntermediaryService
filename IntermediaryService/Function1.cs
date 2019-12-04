@@ -20,34 +20,42 @@ namespace IntermediaryService
         {
             try
             {
-                log.LogInformation("C# HTTP trigger function processed a request.");
+                log.LogInformation("Function1 processed a request.");
 
-                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                if (String.IsNullOrWhiteSpace(requestBody))
+                //retrieve the body of the request which should be a ClientDocument
+                ClientDocument clientDocument;
+                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();                
+                try
+                {
+                    clientDocument = JsonConvert.DeserializeObject<ClientDocument>(requestBody);
+                    //Check that the clientDocument object and it's Body property are NOT null                     
+                    if (clientDocument?.Body == null)
+                    {
+                        throw new JsonException("Object was deserialized to null");
+                    }
+                }
+                catch (JsonException ex)
                 {                    
-                    return new BadRequestObjectResult("Could Not Process Body of Request");
+                    log.LogInformation(ex, UserFriendlyMessages.ErrorProcessingBody,requestBody);
+                    return new BadRequestObjectResult(UserFriendlyMessages.ErrorProcessingBody);
                 }
 
                 
-                try
-                {
-                    var data = JsonConvert.DeserializeObject<ClientDocument>(requestBody);
-                }
-                catch (JsonException ex)
-                {
-                    var errorMessage = "Could Not Process Body of Request";
-                    log.LogInformation(ex, errorMessage);
-                    return new BadRequestObjectResult("Could Not Process Body of Request");
-                }
 
 
                 return new OkObjectResult("Success");
             }            
             catch (Exception ex) //gracefully deal with an unhandled exception
             {
-                log.LogError(ex, "Unhandled Exception occurred");
+                log.LogError(ex, UserFriendlyMessages.UnhandledException);
                 return new StatusCodeResult(500);
             }
         }
+
+
+
+
+
+
     }
 }

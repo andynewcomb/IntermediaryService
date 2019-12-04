@@ -28,7 +28,7 @@ namespace IntermediaryService.Tests
 
 
             //assert                        
-            Assert.IsTrue(mockLogger.GetLogs().Where(m=>m.Contains("Unhandled Exception occurred")).Count() == 1);
+            Assert.IsTrue(mockLogger.GetLogs().Where(m=>m.Contains(UserFriendlyMessages.UnhandledException)).Any());
             Assert.IsInstanceOfType(actionResult, typeof(StatusCodeResult));
             Assert.IsTrue(String.Equals(((StatusCodeResult)actionResult).StatusCode, 500));
             
@@ -44,7 +44,7 @@ namespace IntermediaryService.Tests
         [TestMethod]
         public async Task Run_NoBodyInRequest_Return400()
         {
-            //arrange            
+            //arrange
             var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody("");                        
             var mockLogger = new MockLogger();
 
@@ -53,7 +53,7 @@ namespace IntermediaryService.Tests
 
             //assert                                    
             Assert.IsInstanceOfType(actionResult, typeof(BadRequestObjectResult));
-            StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), "Could Not Process Body of Request");
+            StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), UserFriendlyMessages.ErrorProcessingBody);
         }
 
         [DataTestMethod]        
@@ -69,12 +69,29 @@ namespace IntermediaryService.Tests
             var actionResult = await Function1.Run(mockHttpRequest.Object, mockLogger);
 
             //assert 
-            Assert.IsTrue(mockLogger.GetLogs().Where(m => m.Contains("Could Not Process Body of Request")).Count() == 1);
+            Assert.IsTrue(mockLogger.GetLogs().Where(m => m.Contains(UserFriendlyMessages.ErrorProcessingBody)).Count() == 1);
             Assert.IsInstanceOfType(actionResult, typeof(BadRequestObjectResult));
-            StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), "Could Not Process Body of Request");
+            StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), UserFriendlyMessages.ErrorProcessingBody);
         }
 
-        
+        [DataTestMethod]
+        [DataRow("{}")]
+        [DataRow("{\"buddy\":\"some value\"}")]
+        public async Task Run_JsonObjectDeserialized_BodyPropertyNull_Return400(string body)
+        {
+            //arrange            
+            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(body);
+            var mockLogger = new MockLogger();
+
+            //act
+            var actionResult = await Function1.Run(mockHttpRequest.Object, mockLogger);
+
+            //assert 
+            Assert.IsTrue(mockLogger.GetLogs().Where(m => m.Contains(UserFriendlyMessages.ErrorProcessingBody)).Any());
+            Assert.IsInstanceOfType(actionResult, typeof(BadRequestObjectResult));
+            StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), UserFriendlyMessages.ErrorProcessingBody);
+        }
+
         private Mock<HttpRequest> CreateMockHttpRequestWithSpecifiedBody(string body)
         {            
             var memoryStream = new MemoryStream();
