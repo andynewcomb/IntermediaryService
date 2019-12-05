@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using BusinessDomainObjects;
 
 namespace IntermediaryService
 {
@@ -15,13 +16,14 @@ namespace IntermediaryService
         [FunctionName("Function2")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "{documentId:guid}/{statusCode}")] HttpRequest req,
-            Guid documentId,
-            string statusCode,
+            [CosmosDB(databaseName:"IntermediaryServiceDb", collectionName:"IntermediaryService",
+                ConnectionStringSetting = "CosmosDBConnection",Id="{documentId}", PartitionKey ="{statusCode}")]
+                IntermediaryServiceDocument intermediaryServiceDocument,
             ILogger log)
         {
             try
             {   
-                log.LogInformation($"Function 2 processed a request: {documentId}");
+                log.LogInformation($"Function 2 processed a request");
                 return new NoContentResult();
             }            
 
