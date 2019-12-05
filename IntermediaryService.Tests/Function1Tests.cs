@@ -124,7 +124,7 @@ namespace IntermediaryService.Tests
         }
 
         [TestMethod]
-        public async Task Run_GoodRequest_ReturnsOriginalDocument()
+        public async Task Run_GoodRequest_ReturnsUniqueId()
         {
             //arrange
             var document = new Document() { Body = "Some Text" };
@@ -139,7 +139,10 @@ namespace IntermediaryService.Tests
             _mockHttpClient.Verify();
             Assert.IsInstanceOfType(actionResult, typeof(OkObjectResult));
             Assert.IsInstanceOfType(_cosmosDocument, typeof(IntermediaryServiceDocument));
-            Assert.IsTrue(String.Equals(document.Body, ((Document)((OkObjectResult)actionResult).Value).Body));
+            var returnValue = ((OkObjectResult)actionResult).Value;
+
+            Guid guidOutput;
+            Assert.IsTrue(Guid.TryParse((string)returnValue, out guidOutput));
         }
 
 

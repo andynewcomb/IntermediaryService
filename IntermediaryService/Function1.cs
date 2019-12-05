@@ -69,7 +69,7 @@ namespace IntermediaryService
                     CreateDate = DateTime.UtcNow.ToString()
                 };
                 
-                return new OkObjectResult(document);
+                return new OkObjectResult(intermediaryDocument.id);
             }            
             catch (Exception ex) //gracefully deal with an unhandled exception
             {
