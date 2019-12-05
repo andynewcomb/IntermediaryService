@@ -15,15 +15,23 @@ namespace IntermediaryService
     {
         [FunctionName("Function2")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "{documentId:guid}/{statusCode}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "{documentId:guid}/{serviceName}")] HttpRequest req,
             [CosmosDB(databaseName:"IntermediaryServiceDb", collectionName:"IntermediaryService",
-                ConnectionStringSetting = "CosmosDBConnection",Id="{documentId}", PartitionKey ="{statusCode}")]
+                ConnectionStringSetting = "CosmosDBConnection",Id="{documentId}", PartitionKey ="{serviceName}")]
                 IntermediaryServiceDocument intermediaryServiceDocument,
             ILogger log)
         {
             try
             {
                 log.LogInformation($"Function 2 processed a request");
+
+                //validate that a document was actually retrieved from CosmosDb
+                if (intermediaryServiceDocument == null)
+                {                    
+                    log.LogWarning(UserFriendlyMessages.DocumentNotFound, req);
+                    return new NotFoundObjectResult(UserFriendlyMessages.DocumentNotFound);
+                }
+
                 //validate the string is "STARTED"
                 string requestBody = new StreamReader(req.Body).ReadToEndAsync().Result;
                 if (!String.Equals(requestBody,"STARTED"))
@@ -31,7 +39,15 @@ namespace IntermediaryService
                     log.LogWarning(UserFriendlyMessages.UnexpectedBodyContent, req);
                     return new BadRequestObjectResult(UserFriendlyMessages.UnexpectedBodyContent);
                 }
-                
+
+                //Update the document
+                var status = new Status()
+                {
+                    StatusCode = "STARTED",
+                    TimeStamp = DateTime.UtcNow.ToString()
+                };
+                intermediaryServiceDocument.Status = status;
+
                 return new NoContentResult();
             }            
 

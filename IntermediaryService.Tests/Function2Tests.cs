@@ -44,6 +44,21 @@ namespace IntermediaryService.Tests
             StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), UserFriendlyMessages.UnexpectedBodyContent);
         }
 
+        [TestMethod]
+        public async Task Run_CosmosDbReturnsNoDocument_Return404NotFound()
+        {
+            //arrange            
+            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody("STARTED");
+
+            //act            
+            var actionResult = await Function2.Run(mockHttpRequest.Object, null, _mockLogger);
+
+            //assert 
+            Assert.IsTrue(_mockLogger.GetLogs().Where(m => m.Contains(UserFriendlyMessages.DocumentNotFound)).Count() == 1);
+            Assert.IsInstanceOfType(actionResult, typeof(NotFoundObjectResult));
+            StringAssert.Contains(((NotFoundObjectResult)actionResult).Value.ToString(), UserFriendlyMessages.DocumentNotFound);
+        }
+
         //test when no document matches
 
 

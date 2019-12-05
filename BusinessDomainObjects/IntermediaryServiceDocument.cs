@@ -9,5 +9,7 @@ namespace BusinessDomainObjects
         public string id { get; set; }
         public Document Document { get; set; }        
         public Status Status { get; set; }
+        public string CreateDate { get; set; }
+        public string ServiceName { get; set; }
     }
 }
