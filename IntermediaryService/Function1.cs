@@ -51,12 +51,12 @@ namespace IntermediaryService
                     return new BadRequestObjectResult(UserFriendlyMessages.ErrorProcessingBody);
                 }
 
-                var uniqueId = Guid.NewGuid().ToString(); 
-                var statusCode = "Sent"; //status code represents the partition key for the cosmoDb container
-                var callBack = $"/{uniqueId}/{statusCode}"; 
+                var uniqueId = Guid.NewGuid().ToString();
+                var serviceName = "ThirdParty"; //partition key for the cosmos container
+                var callBack = $"/{uniqueId}/{serviceName}"; 
                 //send to third party using the injected httpClient.
                 //Note: I initually used "await" - however when I added the Cosmos output binding the method could no longer be "async"
-                //Perhaps will use static CosmosDb client instead if "async" is necessary.
+                //Perhaps use static CosmosDb client instead if "async" is necessary.
                 var success = _thirdPartyServiceHttpClient.PostAsyncSuccessful(document, callBack, log).Result;
 
                 //Now Generate an "Intermediary Service Document" to be stored in CosmosDB
@@ -64,13 +64,9 @@ namespace IntermediaryService
                 intermediaryDocument = new IntermediaryServiceDocument
                 {
                     id = uniqueId,
-                    Document = document,
-                    Status = new Status
-                    {
-                        StatusCode = statusCode,
-                        Detail = "",
-                        TimeStamp = DateTime.UtcNow.ToString()
-                    }
+                    Document = document,                    
+                    ServiceName = "ThirdParty", //partition key
+                    CreateDate = DateTime.UtcNow.ToString()
                 };
                 
                 return new OkObjectResult(document);
