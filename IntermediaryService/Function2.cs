@@ -14,21 +14,22 @@ namespace IntermediaryService
     {
         [FunctionName("Function2")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "started/{documentId:guid}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "{documentId:guid}/{statusCode}")] HttpRequest req,
             Guid documentId,
+            string statusCode,
             ILogger log)
         {
-            log.LogInformation($"Function 2 processed a request: {documentId}");
+            try
+            {   
+                log.LogInformation($"Function 2 processed a request: {documentId}");
+                return new NoContentResult();
+            }            
 
-            string name = req.Query["name"];
-
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            catch (Exception ex) //gracefully deal with an unhandled exception
+            {                
+                log.LogError(ex, UserFriendlyMessages.UnhandledException);
+                return new StatusCodeResult(500);
+            }
         }
     }
 }

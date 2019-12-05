@@ -29,6 +29,11 @@ namespace IntermediaryService.Tests.HelperMockClasses
             logs.Add(message);
         }
 
+        public void LogInformation(string message)
+        {
+
+        }
+
         public IList<string> GetLogs()
         {
             return logs;
