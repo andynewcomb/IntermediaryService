@@ -22,8 +22,16 @@ namespace IntermediaryService
             ILogger log)
         {
             try
-            {   
+            {
                 log.LogInformation($"Function 2 processed a request");
+                //validate the string is "STARTED"
+                string requestBody = new StreamReader(req.Body).ReadToEndAsync().Result;
+                if (!String.Equals(requestBody,"STARTED"))
+                {
+                    log.LogWarning(UserFriendlyMessages.UnexpectedBodyContent, req);
+                    return new BadRequestObjectResult(UserFriendlyMessages.UnexpectedBodyContent);
+                }
+                
                 return new NoContentResult();
             }            
 

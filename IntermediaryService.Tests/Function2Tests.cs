@@ -24,6 +24,30 @@ namespace IntermediaryService.Tests
             _mockLogger = new MockLogger();
         }
 
+        [DataTestMethod]
+        [DataRow("blabla")]
+        [DataRow("%&*")]
+        [DataRow("")]
+        [DataRow(" ")]
+        [DataRow("Started")]
+        public async Task Run_BodyDoesNotContainSTARTED_Return400BadRequest(string body)
+        {
+            //arrange            
+            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(body);
+
+            //act            
+            var actionResult = await Function2.Run(mockHttpRequest.Object, new IntermediaryServiceDocument(), _mockLogger);
+
+            //assert 
+            Assert.IsTrue(_mockLogger.GetLogs().Where(m => m.Contains(UserFriendlyMessages.UnexpectedBodyContent)).Count() == 1);
+            Assert.IsInstanceOfType(actionResult, typeof(BadRequestObjectResult));
+            StringAssert.Contains(((BadRequestObjectResult)actionResult).Value.ToString(), UserFriendlyMessages.UnexpectedBodyContent);
+        }
+
+        //test when no document matches
+
+
+
         //[TestMethod]
         //public async Task Run_CatchAnyExceptionsTricklingUpToTopLevelFunctionCode()
         //{
@@ -44,24 +68,19 @@ namespace IntermediaryService.Tests
         //    //Assert.IsNull(_cosmosDocument); //Make sure cosmos document won't be saved
         //}
 
-        
 
+        private Mock<HttpRequest> CreateMockHttpRequestWithSpecifiedBody(string body)
+        {
+            var memoryStream = new MemoryStream();
+            var streamWriter = new StreamWriter(memoryStream);
+            streamWriter.Write(body);
+            streamWriter.Flush();
+            memoryStream.Position = 0;
 
-
-
-
-        //private Mock<HttpRequest> CreateMockHttpRequestWithSpecifiedBody(string body)
-        //{
-        //    var memoryStream = new MemoryStream();
-        //    var streamWriter = new StreamWriter(memoryStream);
-        //    streamWriter.Write(body);
-        //    streamWriter.Flush();
-        //    memoryStream.Position = 0;
-
-        //    var mockHttpRequest = new Mock<HttpRequest>();
-        //    mockHttpRequest.Setup(r => r.Body).Returns(memoryStream);
-        //    return mockHttpRequest;
-        //}
+            var mockHttpRequest = new Mock<HttpRequest>();
+            mockHttpRequest.Setup(r => r.Body).Returns(memoryStream);
+            return mockHttpRequest;
+        }
 
 
 
