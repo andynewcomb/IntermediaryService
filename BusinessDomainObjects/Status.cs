@@ -10,7 +10,7 @@ namespace BusinessDomainObjects
         {
             StatusCode = thirdPartyStatus.Status;
             Detail = thirdPartyStatus.Detail;
-            TimeStamp = DateTime.UtcNow.ToLongTimeString();
+            TimeStamp = DateTime.UtcNow.ToLongDateString();
         }
 
         public string StatusCode { get; set; }
