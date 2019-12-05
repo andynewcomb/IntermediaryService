@@ -41,12 +41,9 @@ namespace IntermediaryService
                 }
 
                 //Update the document
-                var status = new Status()
-                {
-                    StatusCode = "STARTED",
-                    TimeStamp = DateTime.UtcNow.ToString()
-                };
-                intermediaryServiceDocument.Status = status;
+                intermediaryServiceDocument.HasStarted = true;
+                //TODO: the thirdparty service could send another "START" post for this same document
+                //we may want to intercept such a request and log it and handle accordingly
 
                 return new NoContentResult();
             }            

@@ -11,5 +11,6 @@ namespace BusinessDomainObjects
         public Status Status { get; set; }
         public string CreateDate { get; set; }
         public string ServiceName { get; set; }
+        public bool HasStarted { get; set; }
     }
 }

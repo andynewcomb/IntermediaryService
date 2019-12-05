@@ -59,29 +59,7 @@ namespace IntermediaryService.Tests
             StringAssert.Contains(((NotFoundObjectResult)actionResult).Value.ToString(), UserFriendlyMessages.DocumentNotFound);
         }
 
-        //test when no document matches
-
-
-
-        //[TestMethod]
-        //public async Task Run_CatchAnyExceptionsTricklingUpToTopLevelFunctionCode()
-        //{
-        //    //arrange            
-        //    var mockHttpRequest = new Mock<HttpRequest>();
-        //    var guid = Guid.NewGuid();
-        //    var mockLogger = new Mock<MockLogger>();
-        //    mockLogger.Setup(l => l.LogInformation(It.IsAny<string>())).Throws(new Exception("DANGER")).Verifiable();
-
-        //    //act
-        //    var actionResult = await Function2.Run(mockHttpRequest.Object, guid, _mockLogger);
-
-        //    //assert
-        //    mockLogger.Verify();
-        //    Assert.IsTrue(_mockLogger.GetLogs().Where(m => m.Contains(UserFriendlyMessages.UnhandledException)).Any());
-        //    Assert.IsInstanceOfType(actionResult, typeof(StatusCodeResult));
-        //    Assert.IsTrue(String.Equals(((StatusCodeResult)actionResult).StatusCode, 500));
-        //    //Assert.IsNull(_cosmosDocument); //Make sure cosmos document won't be saved
-        //}
+        
 
 
         private Mock<HttpRequest> CreateMockHttpRequestWithSpecifiedBody(string body)
