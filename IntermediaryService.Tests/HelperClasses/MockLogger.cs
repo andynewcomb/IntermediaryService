@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace IntermediaryService.Tests.HelperMockClasses
+namespace IntermediaryService.Tests.HelperClasses
 {
     public class MockLogger : ILogger
     {

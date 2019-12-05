@@ -1,5 +1,5 @@
 using BusinessDomainObjects;
-using IntermediaryService.Tests.HelperMockClasses;
+using IntermediaryService.Tests.HelperClasses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -59,7 +59,7 @@ namespace IntermediaryService.Tests
         public async Task Run_NoBodyInRequest_Return400()
         {
             //arrange
-            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody("");                                    
+            var mockHttpRequest = MockHttpRequestGenerator.CreateWithBodyString("");                                    
 
             //act
             var actionResult = _function1.Run(mockHttpRequest.Object, out _cosmosDocument, _mockLogger);
@@ -76,7 +76,7 @@ namespace IntermediaryService.Tests
         public async Task Run_MalformedBodyInRequest_Return400(string body)
         {
             //arrange            
-            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(body);            
+            var mockHttpRequest = MockHttpRequestGenerator.CreateWithBodyString(body);            
 
             //act
             var actionResult = _function1.Run(mockHttpRequest.Object, out _cosmosDocument, _mockLogger);
@@ -94,7 +94,7 @@ namespace IntermediaryService.Tests
         public async Task Run_JsonObjectDeserialized_BodyPropertyNull_Return400(string body)
         {
             //arrange            
-            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(body);            
+            var mockHttpRequest = MockHttpRequestGenerator.CreateWithBodyString(body);            
 
             //act
             var actionResult = _function1.Run(mockHttpRequest.Object, out _cosmosDocument, _mockLogger);
@@ -111,7 +111,7 @@ namespace IntermediaryService.Tests
         {
             //arrange            
             var goodJson = "{\"body\":\"Some Text\"}";
-            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(goodJson);
+            var mockHttpRequest = MockHttpRequestGenerator.CreateWithBodyString(goodJson);
             _mockHttpClient.Setup(c => c.PostAsyncSuccessful(It.IsAny<Document>(), It.IsAny<string>(),It.IsAny<ILogger>())).Returns(Task.FromResult(true)).Verifiable();
 
             //act
@@ -129,7 +129,7 @@ namespace IntermediaryService.Tests
             //arrange
             var document = new Document() { Body = "Some Text" };
             var documentAsJson = JsonConvert.SerializeObject(document);
-            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(documentAsJson);
+            var mockHttpRequest = MockHttpRequestGenerator.CreateWithBodyString(documentAsJson);
             _mockHttpClient.Setup(c => c.PostAsyncSuccessful(It.IsAny<Document>(), It.IsAny<string>(), It.IsAny<ILogger>())).Returns(Task.FromResult(true)).Verifiable();
 
             //act
@@ -143,31 +143,7 @@ namespace IntermediaryService.Tests
         }
 
 
-
-
         //test for content-type json (content negotiation if desired)
-
-
-
-
-
-
-        private Mock<HttpRequest> CreateMockHttpRequestWithSpecifiedBody(string body)
-        {            
-            var memoryStream = new MemoryStream();
-            var streamWriter = new StreamWriter(memoryStream);
-            streamWriter.Write(body);
-            streamWriter.Flush();
-            memoryStream.Position = 0;
-            
-            var mockHttpRequest = new Mock<HttpRequest>();
-            mockHttpRequest.Setup(r => r.Body).Returns(memoryStream);
-            return mockHttpRequest;
-        }       
-        
-        
-
-
 
     }
 

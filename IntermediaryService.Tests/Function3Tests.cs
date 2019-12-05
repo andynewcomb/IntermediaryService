@@ -1,5 +1,5 @@
 using BusinessDomainObjects;
-using IntermediaryService.Tests.HelperMockClasses;
+using IntermediaryService.Tests.HelperClasses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -34,7 +34,7 @@ namespace IntermediaryService.Tests
         public async Task Run_BodyDoesNotContainOneOfTheThree_Return400BadRequest(string body)
         {
             //arrange            
-            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(body);
+            var mockHttpRequest = MockHttpRequestGenerator.CreateWithBodyString(body);
 
             //act            
             var actionResult = await Function3.Run(mockHttpRequest.Object, new IntermediaryServiceDocument(), _mockLogger);
@@ -49,7 +49,7 @@ namespace IntermediaryService.Tests
         public async Task Run_CosmosDbReturnsNoDocument_Return404NotFound()
         {
             //arrange            
-            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody("COMPLETED");
+            var mockHttpRequest = MockHttpRequestGenerator.CreateWithBodyString("COMPLETED");
 
             //act            
             var actionResult = await Function3.Run(mockHttpRequest.Object, null, _mockLogger);
@@ -73,7 +73,7 @@ namespace IntermediaryService.Tests
                 Status = status
             };
             string json = JsonConvert.SerializeObject(thirdPartyStatus);
-            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(json);
+            var mockHttpRequest = MockHttpRequestGenerator.CreateWithBodyString(json);
             var intermediaryDocument = new IntermediaryServiceDocument();
 
             //act            
@@ -83,25 +83,6 @@ namespace IntermediaryService.Tests
             Assert.IsInstanceOfType(actionResult, typeof(NoContentResult));
             Assert.IsTrue(string.Equals(status, intermediaryDocument.Status.StatusCode));
         }
-
-
-        private Mock<HttpRequest> CreateMockHttpRequestWithSpecifiedBody(string body)
-        {
-            var memoryStream = new MemoryStream();
-            var streamWriter = new StreamWriter(memoryStream);
-            streamWriter.Write(body);
-            streamWriter.Flush();
-            memoryStream.Position = 0;
-
-            var mockHttpRequest = new Mock<HttpRequest>();
-            mockHttpRequest.Setup(r => r.Body).Returns(memoryStream);
-            return mockHttpRequest;
-        }
-
-
-
-
-
     }
 
 

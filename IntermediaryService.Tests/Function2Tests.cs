@@ -1,5 +1,5 @@
 using BusinessDomainObjects;
-using IntermediaryService.Tests.HelperMockClasses;
+using IntermediaryService.Tests.HelperClasses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -33,7 +33,7 @@ namespace IntermediaryService.Tests
         public async Task Run_BodyDoesNotContainSTARTED_Return400BadRequest(string body)
         {
             //arrange            
-            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody(body);
+            var mockHttpRequest = MockHttpRequestGenerator.CreateWithBodyString(body);
 
             //act            
             var actionResult = await Function2.Run(mockHttpRequest.Object, new IntermediaryServiceDocument(), _mockLogger);
@@ -48,7 +48,7 @@ namespace IntermediaryService.Tests
         public async Task Run_CosmosDbReturnsNoDocument_Return404NotFound()
         {
             //arrange            
-            var mockHttpRequest = CreateMockHttpRequestWithSpecifiedBody("STARTED");
+            var mockHttpRequest = MockHttpRequestGenerator.CreateWithBodyString("STARTED");
 
             //act            
             var actionResult = await Function2.Run(mockHttpRequest.Object, null, _mockLogger);
@@ -58,27 +58,6 @@ namespace IntermediaryService.Tests
             Assert.IsInstanceOfType(actionResult, typeof(NotFoundObjectResult));
             StringAssert.Contains(((NotFoundObjectResult)actionResult).Value.ToString(), UserFriendlyMessages.DocumentNotFound);
         }
-
-        
-
-
-        private Mock<HttpRequest> CreateMockHttpRequestWithSpecifiedBody(string body)
-        {
-            var memoryStream = new MemoryStream();
-            var streamWriter = new StreamWriter(memoryStream);
-            streamWriter.Write(body);
-            streamWriter.Flush();
-            memoryStream.Position = 0;
-
-            var mockHttpRequest = new Mock<HttpRequest>();
-            mockHttpRequest.Setup(r => r.Body).Returns(memoryStream);
-            return mockHttpRequest;
-        }
-
-
-
-
-
     }
 
 

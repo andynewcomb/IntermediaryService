@@ -1,5 +1,5 @@
 ﻿using BusinessDomainObjects;
-using IntermediaryService.Tests.HelperMockClasses;
+using IntermediaryService.Tests.HelperClasses;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
